@@ -1,14 +1,15 @@
 from flask import Flask
-from pymongo import MongoClient
+# from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from flask import request, abort
-from config import MONGO_DB_CONNECTION_STRING
+from flask import request    # ,abort
+# from config import MONGO_DB_CONNECTION_STRING
 
-client = MongoClient(MONGO_DB_CONNECTION_STRING)
-db = client['grade-logging-api']
-GRADE = db['grade']
-TOKEN = db['token']
-TEAM = db['team']
+# TODO: Change this to mysql
+# client = MongoClient(MONGO_DB_CONNECTION_STRING)
+# db = client['grade-logging-api']
+# GRADE = db['grade']
+# TOKEN = db['token']
+# TEAM = db['team']
 
 app = Flask(__name__)
 
@@ -26,7 +27,7 @@ def api_key_middleware():
             "status_code": 401,
             "message": "Authorization header is required"
         }, 401
-        
+
     if utorid is None:
         return {
             "status_code": 400,
@@ -34,9 +35,10 @@ def api_key_middleware():
         }, 400
 
     # check if the token is valid.
-    the_doc = TOKEN.find_one({
-        "utorid": utorid
-    })
+    # the_doc = TOKEN.find_one({
+    #     "utorid": utorid
+    # })
+    the_doc = {'123455': 123543}
 
     if not the_doc:
         return {
@@ -49,7 +51,7 @@ def api_key_middleware():
             "status_code": 401,
             "message": "Invalid token"
         }, 401
-        
+
 @app.before_request
 def before_request():
     response = api_key_middleware()
@@ -77,7 +79,7 @@ def create_grade():
                 "status_code": 400,
                 "message": "utorid, course, and grade are required"
             }, 400
-        
+
         # check if the grade is valid.
         if not isinstance(grade, int) or grade < 0 or grade > 100:
             return {
@@ -87,32 +89,36 @@ def create_grade():
 
         # check if the grade document already exists
 
-        the_doc = GRADE.find_one({
-            "utorid": utorid,
-            "course": course
-        })
+        # TODO: CHANGE THIS TO MYSQL
+        # the_doc = GRADE.find_one({
+        #     "utorid": utorid,
+        #     "course": course
+        # })
+
+        the_doc = True
         if the_doc:
             return {
                 "status_code": 400,
-                "message": "Grade already exists"
+                "message": "Grade already exists (THIS IS NOT IMPLEMENTED)"
             }, 400
-        grade_id = GRADE.insert_one({
-            "utorid": utorid,
-            "course": course,
-            "grade": grade
-        }).inserted_id
-        return {
-            "status_code": 200,
-            "message": "Grade created successfully",
-            "id": str(grade_id)
-        }, 200
+        # TODO CHANGE THIS TO MYSQL
+        # grade_id = GRADE.insert_one({
+        #     "utorid": utorid,
+        #     "course": course,
+        #     "grade": grade
+        # }).inserted_id
+        # return {
+        #     "status_code": 200,
+        #     "message": "Grade created successfully",
+        #     "id": str(grade_id)
+        # }, 200
     except PyMongoError as e:
         print(e)
         return {
             "status_code": 500,
             "message": "Error creating grade"
         }, 500
-    
+
 # An API that returns a grade document, it's a get request with the following path: grade/course/utorid
 # The response body should be a JSON object with the following fields:
 # status: a code
@@ -123,15 +129,21 @@ def get_grade():
     try:
         utorid = request.args.get('utorid') if 'utorid' in request.args else None
         course = request.args.get('course') if 'course' in request.args else None
-        the_doc = GRADE.find_one({
-            "utorid": utorid,
-            "course": course
-        })
+
+        # TODO: CHANGE THIS TO MYSQL
+        # the_doc = GRADE.find_one({
+        #     "utorid": utorid,
+        #     "course": course
+        # })
+
+        the_doc = False
         if not the_doc:
             return {
                 "status_code": 404,
-                "message": "Grade not found"
+                "message": "Grade not found (NOT IMPLEMENTED YET)"
             }, 404
+
+        the_doc = {}
         return {
             "status_code": 200,
             "message": "Grade retrieved successfully",
@@ -151,7 +163,7 @@ def get_grade():
             "status_code": 500,
             "message": "Error retrieving grade"
         }, 500
-    
+
 
 # An API that updates a grade document.
 # The request body should be a JSON object with the following fields:
@@ -173,7 +185,7 @@ def update_grade():
                 "status_code": 400,
                 "message": "utorid, course, and grade are required"
             }
-        
+
         # check if the grade is valid.
         if not isinstance(grade, int) or grade < 0 or grade > 100:
             return {
@@ -183,23 +195,27 @@ def update_grade():
 
         # check if the grade document already exists
 
-        the_doc = GRADE.find_one({
-            "utorid": utorid,
-            "course": course
-        })
+        # TODO: CHANGE THIS TO MYSQL
+        # the_doc = GRADE.find_one({
+        #     "utorid": utorid,
+        #     "course": course
+        # })
+
+        the_doc = False
         if not the_doc:
             return {
                 "status_code": 404,
                 "message": "The grade does not exist, please create it first using POST /grade"
             }
-        
-        GRADE.update_one({
-            "_id": the_doc['_id']
-        }, {
-            "$set": {
-                "grade": grade
-            }
-        })
+
+        # TODO: CHANGE THIS TO MYSQL
+        # GRADE.update_one({
+        #     "_id": the_doc['_id']
+        # }, {
+        #     "$set": {
+        #         "grade": grade
+        #     }
+        # })
         return {
             "status_code": 200,
             "message": "Grade updated successfully"
@@ -210,7 +226,7 @@ def update_grade():
             "status_code": 500,
             "message": "Error updating grade"
         }
-    
+
 
 # An API that deletes a grade document.
 # The request body should be a JSON object with the following fields:
@@ -233,19 +249,23 @@ def delete_grade():
 
         # check if the grade document already exists
 
-        the_doc = GRADE.find_one({
-            "utorid": utorid,
-            "course": course
-        })
+        # TODO: CHANGE THIS TO MYSQL
+        # the_doc = GRADE.find_one({
+        #     "utorid": utorid,
+        #     "course": course
+        # })
+
+        the_doc = False
         if not the_doc:
             return {
                 "status_code": 404,
                 "message": "The grade does not exist, there's no need to delete it."
             }
-        
-        GRADE.delete_one({
-            "_id": the_doc['_id']
-        })
+
+        # TODO: CHANGE THIS TO MYSQL
+        # GRADE.delete_one({
+        #     "_id": the_doc['_id']
+        # })
         return {
             "status_code": 200,
             "message": "Grade deleted successfully"
@@ -268,10 +288,14 @@ def signUp():
     # generate deployment api token.
 
     # first, see if this utorid is associated with a token.
-    the_doc = TOKEN.find_one({
-        "utorid": utorid
-    })
+    # TODO: CHANGE THIS TO MYSQL
+    # the_doc = TOKEN.find_one({
+    #     "utorid": utorid
+    # })
+
+    the_doc = True
     if the_doc:
+        the_doc = {'token': 'EXAMPLE TOKEN'}
         return {
             "status_code": 200,
             "message": "Token generated successfully",
@@ -288,11 +312,12 @@ def signUp():
 
     token = generate_token()
 
+    # TODO: CHANGE THIS TO MYSQL
     # save to DB.
-    TOKEN.insert_one({
-        "utorid": utorid,
-        "token": token
-    })
+    # TOKEN.insert_one({
+    #     "utorid": utorid,
+    #     "token": token
+    # })
 
     # return with token
     return {
@@ -313,10 +338,13 @@ def form_team():
             "message": "utorid and name are required"
         }, 400
 
+    # TODO: CHANGE THIS TO MYSQL
     # check if the team already exists.
-    the_doc = TEAM.find_one({
-        "name": name
-    })
+    # the_doc = TEAM.find_one({
+    #     "name": name
+    # })
+
+    the_doc = True
     if the_doc:
         return {
             "status_code": 400,
@@ -324,20 +352,23 @@ def form_team():
         }, 400
 
     # check if the utorid is already in a team.
-    the_doc = TEAM.find_one({
-        "members": {"$in": [utorid]}
-    })
+    # the_doc = TEAM.find_one({
+    #     "members": {"$in": [utorid]}
+    # })
+
+    the_doc = True
     if the_doc:
         return {
             "status_code": 400,
             "message": "You are already in a team"
         }, 400
-    
+
+    # TODO: CHANGE THIS TO MYSQL
     # create a team.
-    TEAM.insert_one({
-        "name": name, 
-        "members": [utorid]
-    })
+    # TEAM.insert_one({
+    #     "name": name,
+    #     "members": [utorid]
+    # })
 
     return {
         "status_code": 200,
