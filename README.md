@@ -9,8 +9,9 @@ This API is based off the grade-logging API developed by [Chen Pan](https://gith
 
 Link to access API: https://henrytchen.com/custom-api/
 
-Please refer to documentation of AUTH Header requirements!
+**Note: Please refer to documentation of AUTH Header requirements!
 
+Features:
 1) [Sign Up](#sign-up)
 2) [Record A Grade](#record-a-grade)
 3) [Get A Grade](#get-a-grade)
