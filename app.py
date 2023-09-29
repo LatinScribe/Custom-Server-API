@@ -1,7 +1,7 @@
 from flask import Flask
 # from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from flask import request    # ,abort
+from flask import request, jsonify    # ,abort
 # from config import MONGO_DB_CONNECTION_STRING
 
 # TODO: Change this to mysql
@@ -38,7 +38,7 @@ def api_key_middleware():
     # the_doc = TOKEN.find_one({
     #     "utorid": utorid
     # })
-    the_doc = {'123455': 123543}
+    the_doc = {'123455': 123543, 'token': "EXAMPLE_TOKEN"}
 
     if not the_doc:
         return {
@@ -136,20 +136,40 @@ def get_grade():
         #     "course": course
         # })
 
-        the_doc = False
+        the_doc = True
         if not the_doc:
             return {
                 "status_code": 404,
                 "message": "Grade not found (NOT IMPLEMENTED YET)"
             }, 404
 
-        the_doc = {}
+        the_doc = {"utorid": "BILLYBOB(TEST)", "grade": 100}
         return {
             "status_code": 200,
             "message": "Grade retrieved successfully",
             "utorid": the_doc['utorid'],
-            "grade": the_doc['grade']
+            "grade": {
+                "_id": {
+                    "$oid": "64b85b05e66b09ca82769e67"
+                },
+                "course": "CSC207",
+                "grade": 85,
+                "utorid": "t1chenpa"
+            }
         }, 200
+        # return {
+        #     "grade": {
+        #         "_id": {
+        #             "$oid": "64b85b05e66b09ca82769e67"
+        #         },
+        #         "course": "CSC207",
+        #         "grade": 85,
+        #         "utorid": "t1chenpa"
+        #     },
+        #     "message": "Grade retrieved successfully",
+        #     "status_code": 200,
+        #     "utorid": "t1chenpa"
+        # }
     except PyMongoError as e:
         print(e)
         return {
