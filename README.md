@@ -36,7 +36,8 @@ a different id.
 **Required Request Parameters**
 ```json
 {
-    "utorid": "The ID (doesn't have to be your real utorid)"
+    "username": "The ID (doesn't have to be your real utorid)",
+    "password": "The password chosen",
 }
 ```
 #### Success Responses
@@ -69,6 +70,62 @@ a different id.
     "message": "Someone took this username. If you are not the owner of this username or you forgot your token, please sign up with a different username and use the new token instead."
 }
 ```
+
+### Sign In
+
+The API to sign in a "UTORid" (username) for this system.
+
+Note:
+1. Even though we call it "UTORid", you don't have to sign up with your real UTORid.
+You can use any ids you want, if not taken by someone else already.
+2. You need to copy and paste the returned token immediately.
+The token will only be shown once. If you forget the token, you need to sign up with
+a different id.
+
+**URL** : `/signIn`
+
+**Method** : `GET`
+
+**Auth required** : Not required to signup
+
+**Required Request Parameters**
+```json
+{
+    "username": "The ID (doesn't have to be your real utorid)",
+    "password": "The password chosen",
+}
+```
+#### Success Responses
+
+**Condition** :  The utorid has not previously been used to signup for the system.
+
+**Code** : `200 OK`
+
+**Content example** :
+
+```json
+{
+    "status_code": 200,
+    "message": "SIGN IN SUCESSFUL",
+    "token": "UNIQUE_API_TOKEN_FOR_THIS_USERNAME"
+}
+```
+
+#### Error Response
+
+##### UTORid not available.
+
+**Condition** : Password or username incorrect.
+
+**Content example** :
+
+```json
+{
+    "status_code": 400,
+    "message": "INCORRECT USERNAME OR PASSWORD"
+}
+```
+
 
 ### Record a grade
 
