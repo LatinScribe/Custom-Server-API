@@ -3,7 +3,7 @@
 ## Overview
 An API that handles data storage and retrieval requests to our server. Python based using flask, and implements a mySQL database. 
 
-This API is based off the grade-logging API developed by [Chen Pan](https://github.com/ChenPanXYZ?tab=repositories).
+This API is based off the MongolDB grade-logging API developed by [Chen Pan](https://github.com/ChenPanXYZ?tab=repositories).
 
 ## API Documentation (How to use it)
 
