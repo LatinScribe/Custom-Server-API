@@ -60,14 +60,14 @@ a different id.
 
 ##### UTORid not available.
 
-**Condition** : Someone has signed up with this utorid already.
+**Condition** : Someone has signed up with this username already.
 
 **Content example** :
 
 ```json
 {
     "status_code": 200,
-    "message": "Someone took this username. If you are not the owner of this username or you forgot your token, please sign up with a different username and use the new token instead."
+    "message": "Someone has already signed up with this username. Please pick another username"
 }
 ```
 
