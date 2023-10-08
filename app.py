@@ -1,7 +1,15 @@
 from flask import Flask
 # from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from flask import request, jsonify    # ,abort
+from flask import request   # jsonify    ,abort
+
+import mysql.connector
+
+import logging
+import time
+
+import random
+import string
 # from config import MONGO_DB_CONNECTION_STRING
 
 # TODO: Change this to mysql
@@ -11,11 +19,67 @@ from flask import request, jsonify    # ,abort
 # TOKEN = db['token']
 # TEAM = db['team']
 
+# create a connection to the database
+# Set up logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+# Log to console
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+# Also log to a file
+file_handler = logging.FileHandler("cpy-errors.log")
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+config = {
+  'user': 'redacted for security',
+  'password': 'redacted for security',
+  'host': 'redacted for security',
+  'database': 'redacted for security',
+  'raise_on_warnings': True
+}
+
+
+def connect_to_mysql(config, attempts=3, delay=2):
+    attempt = 1
+    # Implement a reconnection routine
+    while attempt < attempts + 1:
+        try:
+            return mysql.connector.connect(**config)
+        except (mysql.connector.Error, IOError) as err:
+            if attempts is attempt:
+                # Attempts to reconnect failed; returning None
+                logger.info("Failed to connect, exiting without a connection: %s", err)
+                return None
+            logger.info(
+                "Connection failed: %s. Retrying (%d/%d)...",
+                err,
+                attempt,
+                attempts-1,
+            )
+            # progressive reconnect delay
+            time.sleep(delay ** attempt)
+            attempt += 1
+    return None
+
+
 app = Flask(__name__)
 
 
 def api_key_middleware():
+    db = connect_to_mysql(config)
+    if db is None:
+        return {
+            "status_code": 401,
+            "message": "Error Connecting to Database"
+        }, 401
+
     if request.endpoint in ['signUp']: return
+    if request.endpoint in ['signIn']: return
     authorization_header = request.headers.get("Authorization")
     # check if get method.
     if request.method == 'GET':
@@ -51,6 +115,117 @@ def api_key_middleware():
             "status_code": 401,
             "message": "Invalid token"
         }, 401
+
+
+@app.route('/signUp', methods=['GET'])
+def signUp():
+    """Sign a user up"""
+
+    # get parameters from request
+    input_username = request.args.get('username') if 'username' in request.args else None
+    password = request.args.get('password') if 'password' in request.args else None
+
+    if input_username is None or password is None:
+        return {
+            "status_code": 401,
+            "message": "NO PASSWORD or USERNAME GIVEN"
+        }, 401
+
+    # connect to database
+    db = connect_to_mysql(config)
+    if db is None:
+        return {
+            "status_code": 408,
+            "message": "Error Connecting to Database. Request has timedout. Please contact Support"
+        }, 408
+
+    cursor = db.cursor()
+
+    # first, see if this utorid is associated with a token.
+    query = 'SELECT username FROM users WHERE username =%s'
+    cursor.execute(query, [input_username])
+    result = cursor.fetchall()
+
+    if result:
+        db.close()
+        return {
+            "status_code": 400,
+            "message": "USERNAME ALREADY EXISTS"
+        }, 400
+
+    # generate deployment api token.
+    def generate_token(length=32):
+        """Generate a random user token"""
+        # Define the characters that can be used in the token
+        characters = string.ascii_letters + string.digits
+
+        # Generate a random token using the specified length
+        token = ''.join(random.choice(characters) for _ in range(length))
+
+        return token
+
+    token = generate_token()
+
+    # save user to DB.
+    insert_user_query = "INSERT INTO users (username, password, token) VALUES (%s, %s, %s)"
+    user = (input_username, password, token)
+    cursor.execute(insert_user_query, user)
+
+    db.commit()
+    db.close()
+
+    # return with token
+    return {
+        "status_code": 200,
+        "message": "Token generated successfully",
+        "token": token
+    }, 200
+
+
+@app.route('/signIn', methods=['GET'])
+def signIn():
+    """Sign a user in"""
+
+    # get parameters from request
+    input_username = request.args.get('username') if 'username' in request.args else None
+    password = request.args.get('password') if 'password' in request.args else None
+
+    if input_username is None or password is None:
+        return {
+            "status_code": 401,
+            "message": "NO PASSWORD or USERNAME GIVEN"
+        }, 401
+
+    # connect to database
+    db = connect_to_mysql(config)
+    if db is None:
+        return {
+            "status_code": 408,
+            "message": "Error Connecting to Database. Request has timedout. Please contact Support"
+        }, 408
+
+    cursor = db.cursor()
+
+    # first, see if this utorid is associated with a token.
+    query = 'SELECT token FROM users WHERE username =%s AND password =%s'
+    cursor.execute(query, (input_username, password))
+    token = cursor.fetchall()
+
+    db.close()
+
+    if not token:
+        return {
+            "status_code": 400,
+            "message": "PASSWORD OR USERNAME INCORRECT"
+        }, 400
+
+    # return with token
+    return {
+        "status_code": 200,
+        "message": "LOGIN SUCESSFUL",
+        "token": token[0]
+    }, 200
+
 
 @app.before_request
 def before_request():
@@ -297,54 +472,6 @@ def delete_grade():
             "message": "Error updating grade"
         }
 
-import random
-import string
-@app.route('/signUp', methods=['GET'])
-def signUp():
-    # get parameters from request
-    utorid = request.args.get('utorid') if 'utorid' in request.args else None
-
-    # generate a random api token.
-    # generate deployment api token.
-
-    # first, see if this utorid is associated with a token.
-    # TODO: CHANGE THIS TO MYSQL
-    # the_doc = TOKEN.find_one({
-    #     "utorid": utorid
-    # })
-
-    the_doc = True
-    if the_doc:
-        the_doc = {'token': 'EXAMPLE TOKEN'}
-        return {
-            "status_code": 200,
-            "message": "Token generated successfully",
-            "token": the_doc['token']
-        }
-    def generate_token(length=32):
-        # Define the characters that can be used in the token
-        characters = string.ascii_letters + string.digits
-
-        # Generate a random token using the specified length
-        token = ''.join(random.choice(characters) for _ in range(length))
-
-        return token
-
-    token = generate_token()
-
-    # TODO: CHANGE THIS TO MYSQL
-    # save to DB.
-    # TOKEN.insert_one({
-    #     "utorid": utorid,
-    #     "token": token
-    # })
-
-    # return with token
-    return {
-        "status_code": 200,
-        "message": "Token generated successfully",
-        "token": token
-    }
 
 # form a team.
 @app.route('/team', methods=['POST'])
