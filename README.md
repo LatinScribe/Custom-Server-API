@@ -13,7 +13,7 @@ Link to access API: https://henrytchen.com/custom-api/
 
 Features:
 1) [Sign Up](#sign-up)
-2) [Record A Grade](#record-a-grade)
+2) [Sign In](#sign-in)
 3) [Get A Grade](#get-a-grade)
 
 ### Sign up
