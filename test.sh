@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# If deployed, use this file for testing purposes
+
 # Disable filename globbing
 set -f
 
