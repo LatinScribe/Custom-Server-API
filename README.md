@@ -17,9 +17,12 @@ Features:
 3) [Get A Grade](#get-a-grade)
 
 Planned Features:
+
 4) Password Reset
-5) Token Reset
-6) More account data storage!
+   
+6) Token Reset
+   
+8) More account data storage!
 
 ### Sign up
 
