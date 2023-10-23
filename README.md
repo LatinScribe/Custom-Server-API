@@ -16,6 +16,9 @@ Features:
 2) [Sign In](#sign-in)
 3) [Get A Grade](#get-a-grade)
 
+Planned Features:
+4) 
+
 ### Sign up
 
 The API to sign up a "UTORid" (username) for this system.
@@ -311,3 +314,8 @@ Or the authorization token doesn't exist. See the documentation for signUp for h
    "message": "Error retrieving grade"
 }
 ```
+
+
+Author: Henry TJ Chen
+
+Questions? Want to implement this for your own project? Reach out to me!
