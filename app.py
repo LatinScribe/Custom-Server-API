@@ -41,10 +41,10 @@ logger.addHandler(file_handler)
 if os.path.isfile('server_data.txt'):
     with open('server_data.txt', 'r') as f:
         lines = f.readlines()
-        user = lines[0]
-        password = lines[1]
-        host = lines[2]
-        database = lines[3]
+        user = lines[0].strip()
+        password = lines[1].strip()
+        host = lines[2].strip()
+        database = lines[3].strip()
 else:
     exit(code="Config file error")
 
@@ -237,7 +237,7 @@ def signIn():
     return {
         "status_code": 200,
         "message": "LOGIN SUCESSFUL",
-        "token": token[0]
+        "token": token[0][0]
     }, 200
 
 
@@ -260,7 +260,7 @@ def existsByName():
 
     # first, see if this utorid is associated with a token.
     query = 'SELECT token FROM users WHERE username =%s'
-    cursor.execute(query, input_username)
+    cursor.execute(query, [input_username])
     token = cursor.fetchall()
 
     db.close()
