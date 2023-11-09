@@ -1,7 +1,9 @@
+import os
+
 from flask import Flask
 # from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from flask import request   # jsonify    ,abort
+from flask import request  # jsonify    ,abort
 
 import mysql.connector
 
@@ -10,6 +12,7 @@ import time
 
 import random
 import string
+
 # from config import MONGO_DB_CONNECTION_STRING
 
 # TODO: Change this to mysql
@@ -35,12 +38,22 @@ file_handler = logging.FileHandler("cpy-errors.log")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
+if os.path.isfile('server_data.txt'):
+    with open('server_data.txt', 'r') as f:
+        lines = f.readlines()
+        user = lines[0]
+        password = lines[1]
+        host = lines[2]
+        database = lines[3]
+else:
+    exit(code="Config file error")
+
 config = {
-  'user': 'redacted for security',
-  'password': 'redacted for security',
-  'host': 'redacted for security',
-  'database': 'redacted for security',
-  'raise_on_warnings': True
+    'user': user,
+    'password': password,
+    'host': host,
+    'database': database,
+    'raise_on_warnings': True
 }
 
 
@@ -59,7 +72,7 @@ def connect_to_mysql(config, attempts=3, delay=2):
                 "Connection failed: %s. Retrying (%d/%d)...",
                 err,
                 attempt,
-                attempts-1,
+                attempts - 1,
             )
             # progressive reconnect delay
             time.sleep(delay ** attempt)
@@ -80,6 +93,7 @@ def api_key_middleware():
 
     if request.endpoint in ['signUp']: return
     if request.endpoint in ['signIn']: return
+    if request.endpoint in ['existsByName']: return
     authorization_header = request.headers.get("Authorization")
     # check if get method.
     if request.method == 'GET':
@@ -227,11 +241,49 @@ def signIn():
     }, 200
 
 
+@app.route('/existsByName', methods=['GET'])
+def existsByName():
+    """Sign a user in"""
+
+    # get parameters from request
+    input_username = request.args.get('username') if 'username' in request.args else None
+
+    # connect to database
+    db = connect_to_mysql(config)
+    if db is None:
+        return {
+            "status_code": 408,
+            "message": "Error Connecting to Database. Request has timedout. Please contact Support"
+        }, 408
+
+    cursor = db.cursor()
+
+    # first, see if this utorid is associated with a token.
+    query = 'SELECT token FROM users WHERE username =%s'
+    cursor.execute(query, input_username)
+    token = cursor.fetchall()
+
+    db.close()
+
+    if not token:
+        return {
+            "status_code": 200,
+            "message": "USER DOES NOT EXISTS"
+        }, 200
+
+    # return with token
+    return {
+        "status_code": 200,
+        "message": "USER EXISTS"
+    }, 200
+
+
 @app.before_request
 def before_request():
     response = api_key_middleware()
     if response is not None:
         return response
+
 
 # An API that creates a grade document.
 # The request body should be a JSON object with the following fields:
@@ -293,6 +345,7 @@ def create_grade():
             "status_code": 500,
             "message": "Error creating grade"
         }, 500
+
 
 # An API that returns a grade document, it's a get request with the following path: grade/course/utorid
 # The response body should be a JSON object with the following fields:
@@ -521,7 +574,6 @@ def form_team():
         "status_code": 200,
         "message": f'Team {name} created successfully'
     }, 200
-
 
 
 if __name__ == '__main__':
