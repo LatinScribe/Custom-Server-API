@@ -77,9 +77,9 @@ The token will also be shown on sign-in.
 }
 ```
 
-##### No username or Password Given
+##### No Username or Password Given
 
-**Condition** : Someone has signed up with this username already.
+**Condition** : Either (or both) the username or password were not passed correctly in the request.
 
 **Content example** :
 
@@ -92,14 +92,10 @@ The token will also be shown on sign-in.
 
 ### Sign In
 
-The API to sign in a "UTORid" (username) for this system.
+The API to sign in with a username and password to the system.
 
 Note:
-1. Even though we call it "UTORid", you don't have to sign up with your real UTORid.
-You can use any ids you want, if not taken by someone else already.
-2. You need to copy and paste the returned token immediately.
-The token will only be shown once. If you forget the token, you need to sign up with
-a different id.
+1.  It might be helpful to copy and paste or save the returned token immediately (you will likely need this again later on)
 
 **URL** : `/signIn`
 
@@ -110,13 +106,13 @@ a different id.
 **Required Request Parameters**
 ```json
 {
-    "username": "The ID (doesn't have to be your real utorid)",
+    "username": "The username chosen",
     "password": "The password chosen",
 }
 ```
 #### Success Responses
 
-**Condition** :  The utorid has not previously been used to signup for the system.
+**Condition** :  The username and password matches the associated user data on the server.
 
 **Code** : `200 OK`
 
@@ -132,16 +128,29 @@ a different id.
 
 #### Error Response
 
-##### UTORid not available.
+##### No Username or Password Given
 
-**Condition** : Password or username incorrect.
+**Condition** : Either (or both) the username or password were not passed correctly in the request.
 
 **Content example** :
 
 ```json
 {
-    "status_code": 400,
-    "message": "INCORRECT USERNAME OR PASSWORD"
+   "status_code": 401,
+   "message": "NO PASSWORD or USERNAME GIVEN"
+}
+```
+
+##### Given Username or Password is incorrect
+
+**Condition** : Either (or both) the username or password were incorrect or incorrectly passed in the request.
+
+**Content example** :
+
+```json
+{
+   "status_code": 401,
+   "message": "PASSWORD OR USERNAME INCORRECT"
 }
 ```
 
