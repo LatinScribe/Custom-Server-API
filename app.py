@@ -248,6 +248,12 @@ def existsByName():
     # get parameters from request
     input_username = request.args.get('username') if 'username' in request.args else None
 
+    if input_username is None:
+        return {
+            "status_code": 401,
+            "message": "NO USERNAME GIVEN"
+        }, 401
+
     # connect to database
     db = connect_to_mysql(config)
     if db is None:
@@ -268,7 +274,7 @@ def existsByName():
     if not token:
         return {
             "status_code": 200,
-            "message": "USER DOES NOT EXISTS"
+            "message": "USER DOES NOT EXIST"
         }, 200
 
     # return with token
