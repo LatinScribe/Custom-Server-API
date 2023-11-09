@@ -154,6 +154,51 @@ Note:
 }
 ```
 
+### Exists by Name
+
+The API to check if a username is already in the system.
+
+**URL** : `/existsByName`
+
+**Method** : `GET`
+
+**Auth required** : Not required
+
+**Required Request Parameters**
+```json
+{
+    "username": "The username to check"
+}
+```
+#### Success Responses
+
+**Condition** :  No errors were thrown in checking
+
+**Code** : `200 OK`
+
+**Content example** :
+
+```json
+{
+    "status_code": 200,
+    "message": "USER DOES NOT EXIST or USER EXISTS"
+}
+```
+
+#### Error Response
+
+##### No Username 
+
+**Condition** : Username was not passed correctly in the request.
+
+**Content example** :
+
+```json
+{
+   "status_code": 401,
+   "message": "NO USERNAME GIVEN"
+}
+```
 
 ### Record a grade
 
