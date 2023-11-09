@@ -26,14 +26,12 @@ Planned Features:
 
 ### Sign up
 
-The API to sign up a "UTORid" (username) for this system.
+The API to sign up a user for this system (with the given username and password).
 
 Note:
-1. Even though we call it "UTORid", you don't have to sign up with your real UTORid.
-You can use any ids you want, if not taken by someone else already.
-2. You need to copy and paste the returned token immediately.
-The token will only be shown once. If you forget the token, you need to sign up with
-a different id.
+1. Username can be any string (currently no rules), if not taken by someone else already.
+2. It might be helpful to copy and paste or save the returned token immediately (you will likely need this again later on).
+The token will also be shown on sign-in. 
 
 **URL** : `/signUp`
 
@@ -44,13 +42,13 @@ a different id.
 **Required Request Parameters**
 ```json
 {
-    "username": "The ID (doesn't have to be your real utorid)",
+    "username": "The username chosen",
     "password": "The password chosen",
 }
 ```
 #### Success Responses
 
-**Condition** :  The utorid has not previously been used to signup for the system.
+**Condition** :  The username has not previously been used to signup for the system.
 
 **Code** : `200 OK`
 
@@ -66,7 +64,7 @@ a different id.
 
 #### Error Response
 
-##### UTORid not available.
+##### Username not available.
 
 **Condition** : Someone has signed up with this username already.
 
@@ -75,7 +73,20 @@ a different id.
 ```json
 {
     "status_code": 200,
-    "message": "Someone has already signed up with this username. Please pick another username"
+    "message": "USERNAME ALREADY EXISTS"
+}
+```
+
+##### No username or Password Given
+
+**Condition** : Someone has signed up with this username already.
+
+**Content example** :
+
+```json
+{
+   "status_code": 401,
+   "message": "NO PASSWORD or USERNAME GIVEN"
 }
 ```
 
@@ -317,6 +328,35 @@ Or the authorization token doesn't exist. See the documentation for signUp for h
 {
    "status_code": 500,
    "message": "Error retrieving grade"
+}
+```
+---
+### General Errors
+##### Database Connection Error (general)
+**Condition** : Error in connecting to database during http request.
+
+**Code** : `400`
+
+**Content example** :
+
+```json
+{
+   "status_code": 400,
+   "message": "Error Connecting to Database. Request has timedout. Please contact Support"
+}
+```
+
+##### Database Connection Error (middleware)
+**Condition** : Error in connecting to the database in the middleware processing.
+
+**Code** : `401`
+
+**Content example** :
+
+```json
+{
+   "status_code": 401,
+   "message": "Error Connecting to Database"
 }
 ```
 
