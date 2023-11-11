@@ -14,7 +14,7 @@ Link to access API: https://henrytchen.com/custom-api/
 Features:
 1) [Sign Up](#sign-up)
 2) [Sign In](#sign-in)
-3) [Get A Grade](#get-a-grade)
+3) [Exists by Name](#exists-by-name)
 
 Planned Features:
 
