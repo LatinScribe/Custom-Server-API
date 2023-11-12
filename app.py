@@ -186,12 +186,18 @@ def signUp():
     cursor.execute(insert_user_query, user)
 
     db.commit()
+
+    query = 'SELECT id FROM users WHERE username =%s'
+    cursor.execute(query, [input_username])
+    id = cursor.fetchall()
+
     db.close()
 
     # return with token
     return {
         "status_code": 200,
         "message": "Token generated successfully",
+        "id": id[0][0],
         "token": token
     }, 200
 
@@ -221,13 +227,13 @@ def signIn():
     cursor = db.cursor()
 
     # first, see if this utorid is associated with a token.
-    query = 'SELECT token FROM users WHERE username =%s AND password =%s'
+    query = 'SELECT id,token FROM users WHERE username =%s AND password =%s'
     cursor.execute(query, (input_username, password))
-    token = cursor.fetchall()
+    result = cursor.fetchall()
 
     db.close()
 
-    if not token:
+    if not result:
         return {
             "status_code": 400,
             "message": "PASSWORD OR USERNAME INCORRECT"
@@ -237,7 +243,8 @@ def signIn():
     return {
         "status_code": 200,
         "message": "LOGIN SUCESSFUL",
-        "token": token[0][0]
+        "id": result[0][0],
+        "token": result[0][1]
     }, 200
 
 
