@@ -56,6 +56,7 @@ The token will also be shown on sign-in.
 
 ```json
 {
+    "id": user_id,
     "status_code": 200,
     "message": "Token generated successfully",
     "token": "UNIQUE_API_TOKEN_FOR_THIS_USERNAME"
@@ -120,6 +121,7 @@ Note:
 
 ```json
 {
+    "id": user_id,
     "status_code": 200,
     "message": "SIGN IN SUCESSFUL",
     "token": "UNIQUE_API_TOKEN_FOR_THIS_USERNAME"
