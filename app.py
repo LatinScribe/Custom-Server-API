@@ -109,7 +109,7 @@ def api_key_middleware():
     if id is None:
         return {
             "status_code": 400,
-            "message": "utorid is required"
+            "message": "id is required"
         }, 400
 
     # check if the token is valid.
@@ -330,15 +330,15 @@ def saveProfile():
         id = request.json['id'] if 'id' in request.json else None
         token = request.headers.get("Authorization")
         finAidReq = request.json['finAidReq'] if 'finAidReq' in request.json else None
-        preProg = request.json['preProg'] if 'preProg' in request.json else None
+        prefProg = request.json['prefProg'] if 'prefProg' in request.json else None
         avgSalary = request.json['avgSalary'] if 'avgSalary' in request.json else None
         uniRankingRange = request.json['uniRankingRange'] if 'uniRankingRange' in request.json else None
         locationPref = request.json['locationPref'] if 'locationPref' in request.json else None
 
-        if not id or not token or not finAidReq or not preProg or not avgSalary or not uniRankingRange or not locationPref:
+        if not id or not token or not finAidReq or not prefProg or not avgSalary or not uniRankingRange or not locationPref:
             return {
                 "status_code": 400,
-                "message": "id, token, finAidReq, preProg, avgSalary, uniRankingRange, locationPref are required"
+                "message": "id, token, finAidReq, prefProg, avgSalary, uniRankingRange, locationPref are required"
             }, 400
 
         db = connect_to_mysql(config)
@@ -349,53 +349,140 @@ def saveProfile():
             }, 408
 
         cursor = db.cursor()
+        # check if the user is already exists in the profile
+        query2 = 'SELECT token FROM profiles WHERE id =%s'
+        cursor.execute(query2, [str(id)])
+        token2 = cursor.fetchall()
+
+        if token2 is not None:
+            return {
+            "status_code": 401,
+            "message": "This user already has a profile in the system. If you want to moddify the profile, please use updateProfile instead"
+        }, 401
 
         # save user to DB.
-        insert_user_query = "INSERT INTO profiles (id, token, finAidReq, preProg, avgSalary, uniRankingRange, locationPref) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        profile = (id, token, finAidReq, preProg, avgSalary, uniRankingRange, locationPref)
+        insert_user_query = "INSERT INTO profiles (id, token, finAidReq, prefProg, avgSalary, uniRankingRange, locationPref) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        profile = (id, token, finAidReq, prefProg, avgSalary, uniRankingRange, locationPref)
         cursor.execute(insert_user_query, profile)
 
         db.commit()
 
         db.close()
 
-        # check if the grade is valid.
-        # if not isinstance(grade, int) or grade < 0 or grade > 100:
-        #     return {
-        #         "status_code": 400,
-        #         "message": "grade must be an integer between 0 and 100"
-        #     }, 400
-
-        # check if the grade document already exists
-
-        # TODO: CHANGE THIS TO MYSQL
-        # the_doc = GRADE.find_one({
-        #     "utorid": utorid,
-        #     "course": course
-        # })
-
-        # the_doc = True
-        # if the_doc:
-        #     return {
-        #         "status_code": 400,
-        #         "message": "Grade already exists (THIS IS NOT IMPLEMENTED)"
-        #     }, 400
-        # TODO CHANGE THIS TO MYSQL
-        # grade_id = GRADE.insert_one({
-        #     "utorid": utorid,
-        #     "course": course,
-        #     "grade": grade
-        # }).inserted_id
-        # return {
-        #     "status_code": 200,
-        #     "message": "Grade created successfully",
-        #     "id": str(grade_id)
-        # }, 200
     except Exception as e:
         print(e)
         return {
             "status_code": 500,
-            "message": "Error creating grade"
+            "message": "Error saving profile"
+        }, 500
+
+    return {
+        "status_code": 200,
+        "message": "Profile Saved Successfully"
+    }, 200
+
+
+
+@app.route('/updateProfile', methods=['PUT'])
+def updateProfile():
+    try:
+        id = request.json['id'] if 'id' in request.json else None
+        token = request.headers.get("Authorization")
+        finAidReq = request.json['finAidReq'] if 'finAidReq' in request.json else None
+        prefProg = request.json['prefProg'] if 'prefProg' in request.json else None
+        avgSalary = request.json['avgSalary'] if 'avgSalary' in request.json else None
+        uniRankingRange = request.json['uniRankingRange'] if 'uniRankingRange' in request.json else None
+        locationPref = request.json['locationPref'] if 'locationPref' in request.json else None
+
+        if not id or not token or not finAidReq or not prefProg or not avgSalary or not uniRankingRange or not locationPref:
+            return {
+                "status_code": 400,
+                "message": "id, token, finAidReq, prefProg, avgSalary, uniRankingRange, locationPref are required"
+            }, 400
+
+        db = connect_to_mysql(config)
+        if db is None:
+            return {
+                "status_code": 408,
+                "message": "Error Connecting to Database. Request has timedout. Please contact Support"
+            }, 408
+
+        cursor = db.cursor()
+        # check if the user is already exists in the profile
+        query2 = 'SELECT token FROM profiles WHERE id =%s'
+        cursor.execute(query2, [str(id)])
+        token2 = cursor.fetchall()
+
+        if token2 is None:
+            return {
+            "status_code": 401,
+            "message": "This user does not have a profile in the system yet. Please save a profile first"
+        }, 401
+
+        # update profile
+        cursor.execute("""
+           UPDATE profiles
+           SET token=%s, finAidReq=%s, prefProg=%s, avgSalary=%s, uniRankingRange=%s, locationPref=%s
+           WHERE id=%s
+        """, (token, finAidReq, prefProg, avgSalary, uniRankingRange, locationPref, id))
+
+        db.commit()
+
+        db.close()
+
+    except Exception as e:
+        print(e)
+        return {
+            "status_code": 500,
+            "message": "Error saving profile"
+        }, 500
+
+    return {
+        "status_code": 200,
+        "message": "Profile updated Successfully"
+    }, 200
+
+@app.route('/profile', methods=['GET'])
+def get_profile():
+    try:
+        id = request.args.get('id') if 'id' in request.args else None
+        token = request.headers.get("Authorization")
+
+        db = connect_to_mysql(config)
+        if db is None:
+            return {
+                "status_code": 408,
+                "message": "Error Connecting to Database. Request has timedout. Please contact Support"
+            }, 408
+
+        cursor = db.cursor()
+        # check if the user is already exists in the profile
+        query = "SELECT * FROM profiles WHERE token=%s"
+        cursor.execute(query, [token])
+        the_doc = cursor.fetchall()
+
+        if not the_doc:
+            return {
+                "status_code": 404,
+                "message": "No Profile associated with this token"
+            }, 404
+
+        return {
+            "status_code": 200,
+            "message": "Grade retrieved successfully",
+            "finAidReq": the_doc[0][2],
+            "prefProg": the_doc[0][3],
+            "avgSalary": the_doc[0][4],
+            "uniRankingRange": the_doc[0][5],
+            "locationPref": the_doc[0][6]
+        }, 200
+
+    except Exception as e:
+        print("error")
+        print(e)
+        return {
+            "status_code": 500,
+            "message": "Error retrieving profile"
         }, 500
 
 # An API that creates a grade document.
