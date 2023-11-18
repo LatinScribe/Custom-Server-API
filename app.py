@@ -97,34 +97,61 @@ def api_key_middleware():
     authorization_header = request.headers.get("Authorization")
     # check if get method.
     if request.method == 'GET':
-        utorid = request.args.get('utorid') if 'utorid' in request.args else None
+        id = request.args.get('id') if 'id' in request.args else None
     else:
-        utorid = request.json['utorid'] if 'utorid' in request.json else None
+        id = request.json['id'] if 'id' in request.json else None
     if not authorization_header:
         return {
             "status_code": 401,
             "message": "Authorization header is required"
         }, 401
 
-    if utorid is None:
+    if id is None:
         return {
             "status_code": 400,
             "message": "utorid is required"
         }, 400
 
     # check if the token is valid.
+    # So if it is associated with an account
     # the_doc = TOKEN.find_one({
     #     "utorid": utorid
     # })
-    the_doc = {'123455': 123543, 'token': "EXAMPLE_TOKEN"}
+    # the_doc = {'123455': 123543, 'token': "EXAMPLE_TOKEN"}
 
-    if not the_doc:
+    # connect to database
+    db = connect_to_mysql(config)
+    if db is None:
+        return {
+            "status_code": 408,
+            "message": "Error Connecting to Database. Request has timedout. Please contact Support"
+        }, 408
+
+    cursor = db.cursor()
+
+    query = 'SELECT token FROM users WHERE id =%s'
+    cursor.execute(query, [str(id)])
+    token = cursor.fetchall()
+
+    # query2 = 'SELECT token FROM profiles WHERE id =%s'
+    # cursor.execute(query2, [str(id)])
+    # token2 = cursor.fetchall()
+
+    db.close()
+
+    if not token:
         return {
             "status_code": 401,
-            "message": "The UTORid is not associated with a token. Please sign up first."
+            "message": "The id is not associated with a token. Please sign up first."
         }, 401
 
-    if authorization_header != the_doc['token']:
+    # if not token2:
+    #     return {
+    #         "status_code": 401,
+    #         "message": "The id is not associated with a profile. Please create an account first."
+    #     }, 401
+
+    if authorization_header != token[0][0]:
         return {
             "status_code": 401,
             "message": "Invalid token"
@@ -297,6 +324,79 @@ def before_request():
     if response is not None:
         return response
 
+@app.route('/saveProfile', methods=['POST'])
+def saveProfile():
+    try:
+        id = request.json['id'] if 'id' in request.json else None
+        token = request.headers.get("Authorization")
+        finAidReq = request.json['finAidReq'] if 'finAidReq' in request.json else None
+        preProg = request.json['preProg'] if 'preProg' in request.json else None
+        avgSalary = request.json['avgSalary'] if 'avgSalary' in request.json else None
+        uniRankingRange = request.json['uniRankingRange'] if 'uniRankingRange' in request.json else None
+        locationPref = request.json['locationPref'] if 'locationPref' in request.json else None
+
+        if not id or not token or not finAidReq or not preProg or not avgSalary or not uniRankingRange or not locationPref:
+            return {
+                "status_code": 400,
+                "message": "id, token, finAidReq, preProg, avgSalary, uniRankingRange, locationPref are required"
+            }, 400
+
+        db = connect_to_mysql(config)
+        if db is None:
+            return {
+                "status_code": 408,
+                "message": "Error Connecting to Database. Request has timedout. Please contact Support"
+            }, 408
+
+        cursor = db.cursor()
+
+        # save user to DB.
+        insert_user_query = "INSERT INTO profiles (id, token, finAidReq, preProg, avgSalary, uniRankingRange, locationPref) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        profile = (id, token, finAidReq, preProg, avgSalary, uniRankingRange, locationPref)
+        cursor.execute(insert_user_query, profile)
+
+        db.commit()
+
+        db.close()
+
+        # check if the grade is valid.
+        # if not isinstance(grade, int) or grade < 0 or grade > 100:
+        #     return {
+        #         "status_code": 400,
+        #         "message": "grade must be an integer between 0 and 100"
+        #     }, 400
+
+        # check if the grade document already exists
+
+        # TODO: CHANGE THIS TO MYSQL
+        # the_doc = GRADE.find_one({
+        #     "utorid": utorid,
+        #     "course": course
+        # })
+
+        # the_doc = True
+        # if the_doc:
+        #     return {
+        #         "status_code": 400,
+        #         "message": "Grade already exists (THIS IS NOT IMPLEMENTED)"
+        #     }, 400
+        # TODO CHANGE THIS TO MYSQL
+        # grade_id = GRADE.insert_one({
+        #     "utorid": utorid,
+        #     "course": course,
+        #     "grade": grade
+        # }).inserted_id
+        # return {
+        #     "status_code": 200,
+        #     "message": "Grade created successfully",
+        #     "id": str(grade_id)
+        # }, 200
+    # except PyMongoError as e:
+    #     print(e)
+    #     return {
+    #         "status_code": 500,
+    #         "message": "Error creating grade"
+    #     }, 500
 
 # An API that creates a grade document.
 # The request body should be a JSON object with the following fields:
