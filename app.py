@@ -391,12 +391,12 @@ def saveProfile():
         #     "message": "Grade created successfully",
         #     "id": str(grade_id)
         # }, 200
-    # except PyMongoError as e:
-    #     print(e)
-    #     return {
-    #         "status_code": 500,
-    #         "message": "Error creating grade"
-    #     }, 500
+    except Exception as e:
+        print(e)
+        return {
+            "status_code": 500,
+            "message": "Error creating grade"
+        }, 500
 
 # An API that creates a grade document.
 # The request body should be a JSON object with the following fields:
