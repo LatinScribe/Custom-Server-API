@@ -332,13 +332,14 @@ def saveProfile():
         finAidReq = request.json['finAidReq'] if 'finAidReq' in request.json else None
         prefProg = request.json['prefProg'] if 'prefProg' in request.json else None
         avgSalary = request.json['avgSalary'] if 'avgSalary' in request.json else None
-        uniRankingRange = request.json['uniRankingRange'] if 'uniRankingRange' in request.json else None
+        uniRankingRangeStart = request.json['uniRankingRangeStart'] if 'uniRankingRangeStart' in request.json else None
+        uniRankingRangeEnd = request.json['uniRankingRangeEnd'] if 'uniRankingRangeEnd' in request.json else None
         locationPref = request.json['locationPref'] if 'locationPref' in request.json else None
 
-        if not id or not token or not finAidReq or not prefProg or not avgSalary or not uniRankingRange or not locationPref:
+        if not id or not token or not finAidReq or not prefProg or not avgSalary or not uniRankingRangeStart or not uniRankingRangeEnd or not locationPref:
             return {
                 "status_code": 400,
-                "message": "id, token, finAidReq, prefProg, avgSalary, uniRankingRange, locationPref are required"
+                "message": "id, token, finAidReq, prefProg, avgSalary, uniRankingRangeStart, uniRankingRangeEnd, locationPref are required"
             }, 400
 
         db = connect_to_mysql(config)
@@ -354,15 +355,15 @@ def saveProfile():
         cursor.execute(query2, [str(id)])
         token2 = cursor.fetchall()
 
-        if token2 is not None:
+        if token2:
             return {
             "status_code": 401,
             "message": "This user already has a profile in the system. If you want to moddify the profile, please use updateProfile instead"
         }, 401
 
         # save user to DB.
-        insert_user_query = "INSERT INTO profiles (id, token, finAidReq, prefProg, avgSalary, uniRankingRange, locationPref) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        profile = (id, token, finAidReq, prefProg, avgSalary, uniRankingRange, locationPref)
+        insert_user_query = "INSERT INTO profiles (id, token, finAidReq, prefProg, avgSalary, uniRankingRangeStart, uniRankingRangeEnd, locationPref) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        profile = (id, token, finAidReq, prefProg, avgSalary, uniRankingRangeStart, uniRankingRangeEnd, locationPref)
         cursor.execute(insert_user_query, profile)
 
         db.commit()
@@ -391,13 +392,14 @@ def updateProfile():
         finAidReq = request.json['finAidReq'] if 'finAidReq' in request.json else None
         prefProg = request.json['prefProg'] if 'prefProg' in request.json else None
         avgSalary = request.json['avgSalary'] if 'avgSalary' in request.json else None
-        uniRankingRange = request.json['uniRankingRange'] if 'uniRankingRange' in request.json else None
+        uniRankingRangeStart = request.json['uniRankingRangeStart'] if 'uniRankingRangeStart' in request.json else None
+        uniRankingRangeEnd = request.json['uniRankingRangeEnd'] if 'uniRankingRangeEnd' in request.json else None
         locationPref = request.json['locationPref'] if 'locationPref' in request.json else None
 
-        if not id or not token or not finAidReq or not prefProg or not avgSalary or not uniRankingRange or not locationPref:
+        if not id or not token or not finAidReq or not prefProg or not avgSalary or not uniRankingRangeStart or not uniRankingRangeEnd or not locationPref:
             return {
                 "status_code": 400,
-                "message": "id, token, finAidReq, prefProg, avgSalary, uniRankingRange, locationPref are required"
+                "message": "id, token, finAidReq, prefProg, avgSalary, uniRankingRangeStart, uniRankingRangeEnd, locationPref are required"
             }, 400
 
         db = connect_to_mysql(config)
@@ -413,7 +415,7 @@ def updateProfile():
         cursor.execute(query2, [str(id)])
         token2 = cursor.fetchall()
 
-        if token2 is None:
+        if not token2:
             return {
             "status_code": 401,
             "message": "This user does not have a profile in the system yet. Please save a profile first"
@@ -422,9 +424,9 @@ def updateProfile():
         # update profile
         cursor.execute("""
            UPDATE profiles
-           SET token=%s, finAidReq=%s, prefProg=%s, avgSalary=%s, uniRankingRange=%s, locationPref=%s
+           SET token=%s, finAidReq=%s, prefProg=%s, avgSalary=%s, uniRankingRangeStart=%s, uniRankingRangeEnd=%s, locationPref=%s
            WHERE id=%s
-        """, (token, finAidReq, prefProg, avgSalary, uniRankingRange, locationPref, id))
+        """, (token, finAidReq, prefProg, avgSalary, uniRankingRangeStart, uniRankingRangeEnd, locationPref, id))
 
         db.commit()
 
@@ -469,12 +471,13 @@ def get_profile():
 
         return {
             "status_code": 200,
-            "message": "Grade retrieved successfully",
+            "message": "Profile retrieved successfully",
             "finAidReq": the_doc[0][2],
             "prefProg": the_doc[0][3],
             "avgSalary": the_doc[0][4],
-            "uniRankingRange": the_doc[0][5],
-            "locationPref": the_doc[0][6]
+            "uniRankingRangeStart": the_doc[0][5],
+            "uniRankingRangeEnd": the_doc[0][6],
+            "locationPref": the_doc[0][7]
         }, 200
 
     except Exception as e:
