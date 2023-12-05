@@ -24,6 +24,8 @@ Planned Features:
    
 8) More account data storage!
 
+9) Profile data
+
 ### Sign up
 
 The API to sign up a user for this system (with the given username and password).
