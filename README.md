@@ -21,8 +21,6 @@ Planned Features:
 4) Password Reset
    
 6) Token Reset
-   
-8) More account data storage!
 
 9) Profile data
 
