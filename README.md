@@ -5,6 +5,8 @@ An API that handles data storage and retrieval requests to our server. Python ba
 
 This API is based off the MongolDB grade-logging API developed by [Chen Pan](https://github.com/ChenPanXYZ?tab=repositories).
 
+Checkout our full project at: https://github.com/LatinScribe/UniversityExplorer 
+
 ## API Documentation (How to use it)
 
 Link to access API: https://henrytchen.com/custom-api/
