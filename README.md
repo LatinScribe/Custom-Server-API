@@ -24,7 +24,7 @@ Planned Features:
    
 6) Token Reset
 
-9) Profile data
+9) Profile data - creation + retrieve
 
 ### Sign up
 
