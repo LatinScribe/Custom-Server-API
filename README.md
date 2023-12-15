@@ -11,6 +11,8 @@ Checkout our full project at: https://github.com/LatinScribe/UniversityExplorer
 
 Link to access API: https://henrytchen.com/custom-api/
 
+Use the link to make relevant HTTP requests!
+
 **Note: Please refer to documentation of AUTH Header requirements!
 
 Features:
