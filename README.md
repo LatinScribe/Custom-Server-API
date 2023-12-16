@@ -19,6 +19,7 @@ Features:
 1) [Sign Up](#sign-up)
 2) [Sign In](#sign-in)
 3) [Exists by Name](#exists-by-name)
+4) [Save Profile](#save-a-profile)
 
 Planned Features:
 
