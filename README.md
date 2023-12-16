@@ -21,6 +21,7 @@ Features:
 3) [Exists by Name](#exists-by-name)
 4) [Save Profile](#save-a-profile)
 5) [Update Profile](#update-a-profile)
+6) [Retrieve Profile](#retrieve-a-profile)
 
 Planned Features:
 
