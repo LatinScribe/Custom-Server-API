@@ -141,9 +141,9 @@ def api_key_middleware():
 
     if not token:
         return {
-            "status_code": 401,
+            "status_code": 400,
             "message": "The id is not associated with a token. Please sign up first."
-        }, 401
+        }, 400
 
     # if not token2:
     #     return {
@@ -168,9 +168,9 @@ def signUp():
 
     if input_username is None or password is None:
         return {
-            "status_code": 401,
+            "status_code": 400,
             "message": "NO PASSWORD or USERNAME GIVEN"
-        }, 401
+        }, 400
 
     # connect to database
     db = connect_to_mysql(config)
@@ -239,9 +239,9 @@ def signIn():
 
     if input_username is None or password is None:
         return {
-            "status_code": 401,
+            "status_code": 400,
             "message": "NO PASSWORD or USERNAME GIVEN"
-        }, 401
+        }, 400
 
     # connect to database
     db = connect_to_mysql(config)
