@@ -465,9 +465,9 @@ def get_profile():
 
         if not the_doc:
             return {
-                "status_code": 404,
+                "status_code": 400,
                 "message": "No Profile associated with this token"
-            }, 404
+            }, 400
 
         return {
             "status_code": 200,
