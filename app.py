@@ -436,7 +436,7 @@ def updateProfile():
         print(e)
         return {
             "status_code": 500,
-            "message": "Error saving profile"
+            "message": "Error updating profile"
         }, 500
 
     return {
