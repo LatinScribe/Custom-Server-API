@@ -284,9 +284,9 @@ def existsByName():
 
     if input_username is None:
         return {
-            "status_code": 401,
+            "status_code": 400,
             "message": "NO USERNAME GIVEN"
-        }, 401
+        }, 400
 
     # connect to database
     db = connect_to_mysql(config)
@@ -357,9 +357,9 @@ def saveProfile():
 
         if token2:
             return {
-            "status_code": 401,
+            "status_code": 400,
             "message": "This user already has a profile in the system. If you want to moddify the profile, please use updateProfile instead"
-        }, 401
+        }, 400
 
         # save user to DB.
         insert_user_query = "INSERT INTO profiles (id, token, finAidReq, prefProg, avgSalary, uniRankingRangeStart, uniRankingRangeEnd, locationPref) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
@@ -417,9 +417,9 @@ def updateProfile():
 
         if not token2:
             return {
-            "status_code": 401,
+            "status_code": 400,
             "message": "This user does not have a profile in the system yet. Please save a profile first"
-        }, 401
+        }, 400
 
         # update profile
         cursor.execute("""
