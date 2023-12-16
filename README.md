@@ -327,7 +327,111 @@ See the documentation for signUp for how to get a token.
 }, 500
 ```
 
+---
 
+### Update a profile
+
+The API to update the profile of a given user.
+
+Note:
+1. This function should only be used after a profile has already been saved for the given user.
+If the user does not have a profile yet, the saveProfile API should be used instead. 
+
+**URL** : `/updateProfile`
+
+**Method** : `PUT`
+
+**Auth required** : Required in header `Authorization`.
+
+**Required Request Body**
+```json
+{
+    "id": "The user's account id",
+    "finAidReq": "The finantial aid required by the user",
+    "prefProg": "The prefered program selected by user",
+    "avgSalary": "The post-graduate desire salary selected by the user",
+    "uniRankingRangeStart": "The beginning of the range of desired College ranking",
+    "uniRankingRangeEnd": "The end of the range of desired College ranking",
+    "locationPref": "The prefered location selected by the user"
+}
+```
+#### Success Responses
+
+**Condition** : Access to the account is verified by the authorization token, and a profile for the given user exists.
+
+**Code** : `200 OK`
+
+**Content example** : 
+
+```json
+{
+    "message": "Profile updated Successfully",
+    "status_code": 200
+}
+```
+
+#### Error Response
+
+##### No Profile associated to this user.
+
+**Condition** : A profile for this user has not yet been created.
+
+**Code** : `400 BAD REQUEST`
+
+**Content example** :
+
+```json
+{
+    "message": "This user does not have a profile in the system yet. Please save a profile first",
+    "status_code": 400
+}
+```
+
+##### Incorrect or missing request body paraameters
+
+**Condition** : Failed to correctly provide the required request body parameters
+
+**Code** : `400 BAD REQUEST`
+
+**Content example** :
+
+```json
+{
+    "message": "id, token, finAidReq, prefProg, avgSalary, uniRankingRangeStart, uniRankingRangeEnd, locationPref are required",
+    "status_code": 400
+}
+```
+
+##### API Token is invalid
+
+**Condition** : The given authorization token doesn't match with the ones that have the access to the utorid. Or the authorization token doesn't exist.
+See the documentation for signUp for how to get a token.
+
+**Code** : `401`
+
+**Content example** :
+
+```json
+{
+    "message": "Invalid token",
+    "status_code": 401
+}
+```
+
+##### Server Error
+
+**Condition** : The backend server has an issue.
+
+**Code** : `500 Internal Server Error`
+
+**Content example** :
+
+```json
+{
+   "status_code": 500,
+   "message": "Error updating profile"
+}, 500
+```
 
 
 
