@@ -241,7 +241,7 @@ has a profile in the system associated to their account, the updateProfile API s
 ```json
 {
     "id": "The user's account id",
-    "finAidReq: "The finantial aid required by the user",
+    "finAidReq": "The finantial aid required by the user",
     "prefProg": "The prefered program selected by user",
     "avgSalary": "The post-graduate desire salary selected by the user",
     "uniRankingRangeStart": "The beginning of the range of desired College ranking",
