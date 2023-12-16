@@ -63,7 +63,7 @@ The token will also be shown on sign-in. It is recommended that the same be done
 
 ```json
 {
-    "id": user_id,
+    "id": 1234,
     "status_code": 200,
     "message": "Token generated successfully",
     "token": "UNIQUE_API_TOKEN_FOR_THIS_USERNAME"
@@ -132,7 +132,7 @@ Note:
 
 ```json
 {
-    "id": user_id,
+    "id": 1234,
     "status_code": 200,
     "message": "SIGN IN SUCESSFUL",
     "token": "UNIQUE_API_TOKEN_FOR_THIS_USERNAME"
