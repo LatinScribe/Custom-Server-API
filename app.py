@@ -450,6 +450,12 @@ def get_profile():
         id = request.args.get('id') if 'id' in request.args else None
         token = request.headers.get("Authorization")
 
+        if not id:
+            return {
+                "status_code": 400,
+                "message": "No id given"
+            }, 400
+
         db = connect_to_mysql(config)
         if db is None:
             return {
