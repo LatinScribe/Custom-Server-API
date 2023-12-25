@@ -107,7 +107,7 @@ The token will also be shown on sign-in. It is recommended that the same be done
 The API to sign in with a username and password to the system.
 
 Note:
-1.  It might be helpful to copy and paste or save the returned token immediately (you will likely need this again later on)
+1.  It might be helpful to copy and paste or save the returned token immediately (you will likely need this again later on).
 
 **URL** : `/signIn`
 
