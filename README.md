@@ -53,7 +53,7 @@ The token will also be shown on sign-in. It is recommended that the same be done
     "password": "The password chosen",
 }
 ```
-#### Success Responses
+#### Success Responses:
 
 **Condition** :  The username has not previously been used to signup for the system.
 
@@ -70,7 +70,7 @@ The token will also be shown on sign-in. It is recommended that the same be done
 }
 ```
 
-#### Error Response
+#### Error Response:
 
 ##### Username not available.
 
