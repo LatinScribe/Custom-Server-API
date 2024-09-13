@@ -1,5 +1,7 @@
 # Custom-Server-API
 
+# Notice: Server currently deprecated, will be updated soon!
+
 ## Overview
 An API that handles data storage and retrieval requests to our server. Python based using flask, and implements a mySQL database. 
 
